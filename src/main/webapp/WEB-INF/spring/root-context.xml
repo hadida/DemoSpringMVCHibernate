@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	 					http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+	 					http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+	 					http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	 <context:component-scan base-package="com.hadida.demo">
+        <context:exclude-filter type="regex" expression="com\.hadida\.demo\.controler.*"/>
+    </context:component-scan>
+    <context:annotation-config/>
+	
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+
+	
+	<jdbc:embedded-database id="dataSource" type="H2">
+        <jdbc:script location="/WEB-INF/config/schema.sql"/>
+        <jdbc:script location="/WEB-INF/config/test-data.sql"/>
+    </jdbc:embedded-database>
+	
+
+	<bean id="hibernate3AnnotatedSessionFactory"
+        class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="packagesToScan">
+    	<list>
+        	<value>com.hadida.demo.model</value>           
+    	</list>
+		</property>
+       <property name="hibernateProperties">
+        <props>
+        	<prop key="dialect">org.hibernate.dialect.H2Dialect</prop>
+        <!-- <prop key="hibernate.current_session_context_class">thread</prop> -->
+        </props>
+      </property>  
+    </bean>
+    <!--  
+    <bean id="personDAO" class="com.hadida.demo.dao.impl.PersonDaoImpl">
+        <property name="sessionFactory" ref="hibernate3AnnotatedSessionFactory" />
+    </bean>
+	 -->
+	 
+	  
+  <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+    <property name="sessionFactory" ref="hibernate3AnnotatedSessionFactory"/>
+  </bean>
+	 
+		
+</beans>
